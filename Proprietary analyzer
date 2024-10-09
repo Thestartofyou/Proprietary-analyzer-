@@ -1,0 +1,55 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Load the property data
+df = pd.read_csv('property_listings.csv')
+
+# Inspect the first few rows of the dataset
+print(df.head())
+
+# Basic Data Cleaning: Fill missing values (optional, depending on your data)
+df.fillna(0, inplace=True)
+
+# Analyze correlation between days on market and key features like price, location, bedrooms, etc.
+correlation = df.corr()
+print("Correlation Matrix:\n", correlation['days_on_market'])
+
+# Identify properties that have been on the market for longer than the median number of days
+median_days = df['days_on_market'].median()
+long_market_properties = df[df['days_on_market'] > median_days]
+
+# Print summary of properties sitting longer on the market
+print(f"Properties on the market longer than the median of {median_days} days:")
+print(long_market_properties[['price', 'location', 'bedrooms', 'square_footage', 'days_on_market']])
+
+# Price vs Days on Market - Check if pricing is a factor
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='price', y='days_on_market', data=df)
+plt.title('Price vs Days on Market')
+plt.show()
+
+# Bedrooms vs Days on Market - Check if property size is a factor
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='bedrooms', y='days_on_market', data=df)
+plt.title('Bedrooms vs Days on Market')
+plt.show()
+
+# Square Footage vs Days on Market - Check if property size affects time on market
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='square_footage', y='days_on_market', data=df)
+plt.title('Square Footage vs Days on Market')
+plt.show()
+
+# Group by location and see the average days on market by location
+location_group = df.groupby('location')['days_on_market'].mean().sort_values(ascending=False)
+print("Average Days on Market by Location:\n", location_group)
+
+# Plot days on market by location (Top 10 locations)
+plt.figure(figsize=(10, 6))
+sns.barplot(x=location_group.index[:10], y=location_group.values[:10])
+plt.title('Top 10 Locations with Highest Average Days on Market')
+plt.xticks(rotation=45)
+plt.show()
+
+# Conclusion: Based on the analysis, you can identify patterns that suggest why certain properties sit on the market
